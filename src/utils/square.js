@@ -14,6 +14,7 @@ export const Square = ({ data, itemCallbackFn = null }) => {
   let ROW_SIZE = -1
   let COL_SIZE = -1
   let SQUARE = null
+  let INVERSED_SQUARE = null
 
   const init = () => {
     const lines = data.split('\n').slice(0, -1)
@@ -30,6 +31,38 @@ export const Square = ({ data, itemCallbackFn = null }) => {
     })
     ROW_SIZE = lines.length
     COL_SIZE = lines[0].length
+  }
+
+  const clearOutOfBoundPoints = (adjascentPoints = []) => {
+    const clearedAdjascentPoints = []
+
+    for (const adjascentPoint of adjascentPoints) {
+      const [x, y] = adjascentPoint
+      if (x >= 0 && x < ROW_SIZE && y >= 0 && y < COL_SIZE) {
+        clearedAdjascentPoints.push(adjascentPoint)
+      }
+    }
+
+    return clearedAdjascentPoints
+  }
+
+  // Returns those points based on point x(i,j):
+  //
+  //    [ ] [.] [ ]
+  //    [.] [x] [.]
+  //    [ ] [.] [ ]
+  //
+  // Also, clear out of bounds points
+  const getLineAndColumnAdjascentPoints = (point) => {
+    const [i, j] = point
+    const lineAndColumnAdjascentPoints = [
+      [i - 1, j],
+      [i, j - 1],
+      [i, j + 1],
+      [i + 1, j],
+    ]
+
+    return clearOutOfBoundPoints(adjascentPoints)
   }
 
   // Returns those points based on point x(i,j):
@@ -52,26 +85,36 @@ export const Square = ({ data, itemCallbackFn = null }) => {
       [i + 1, j + 1],
     ]
 
-    const adjascentPoints = []
-
-    for (const adjascentPoint of allPossibleAdjascentPoints) {
-      const [x, y] = adjascentPoint
-      if (x >= 0 && x < ROW_SIZE && y >= 0 && y < COL_SIZE) {
-        adjascentPoints.push(adjascentPoint)
-      }
-    }
-
-    return adjascentPoints
+    return clearOutOfBoundPoints(adjascentPoints)
   }
 
   const getMaxLimits = () => [ROW_SIZE, COL_SIZE]
   const getSquare = () => SQUARE
 
+  /**
+   * Note: INVERSED_SQUARE is not a deep copy of objects from
+   * elements!
+   */
+  const getInversedSquare = () => {
+    if (!INVERSED_SQUARE) {
+      INVERSED_SQUARE = Array.from({ length: COL_SIZE }, () => [])
+      for (let i = 0; i < COL_SIZE; i++) {
+        for (let j = 0; j < ROW_SIZE; j++) {
+          INVERSED_SQUARE[i].push(SQUARE[j][i])
+        }
+      }
+    }
+
+    return INVERSED_SQUARE
+  }
+
   init()
   return {
     data,
     getAdjascentPoints,
+    getLineAndColumnAdjascentPoints,
     getMaxLimits,
     getSquare,
+    getInversedSquare,
   }
 }
