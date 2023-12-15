@@ -11,6 +11,7 @@ import solve10 from './10'
 import solve11 from './11'
 import solve12 from './12'
 import solve13 from './13'
+import solve14 from './14'
 // #import
 
 export default function solveAll() {
@@ -27,5 +28,6 @@ export default function solveAll() {
   solve11()
   solve12()
   solve13()
+  solve14()
   // #run
 }
