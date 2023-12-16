@@ -62,7 +62,7 @@ export const Square = ({ data, itemCallbackFn = null }) => {
       [i + 1, j],
     ]
 
-    return clearOutOfBoundPoints(adjascentPoints)
+    return clearOutOfBoundPoints(lineAndColumnAdjascentPoints)
   }
 
   // Returns those points based on point x(i,j):
@@ -85,7 +85,7 @@ export const Square = ({ data, itemCallbackFn = null }) => {
       [i + 1, j + 1],
     ]
 
-    return clearOutOfBoundPoints(adjascentPoints)
+    return clearOutOfBoundPoints(allPossibleAdjascentPoints)
   }
 
   const getMaxLimits = () => [ROW_SIZE, COL_SIZE]
