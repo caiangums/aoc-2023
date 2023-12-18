@@ -15,6 +15,7 @@ import solve14 from './14'
 import solve15 from './15'
 import solve16 from './16'
 import solve17 from './17'
+import solve18 from './18'
 // #import
 
 export default function solveAll() {
@@ -35,5 +36,6 @@ export default function solveAll() {
   solve15()
   solve16()
   solve17()
+  solve18()
   // #run
 }
