@@ -4,7 +4,13 @@ import { Square } from '_utils/square'
 let CITIES = null
 
 let END_CITY = [] // [MAX_ROW, MAX_COL]
-const MAX_MOVES_SAME_DIRECTION = 3 // defined by the challenge
+// defined by the challenge
+const MAX_MOVES_SAME_DIRECTION_PART_1 = 3
+const MAX_MOVES_SAME_DIRECTION_PART_2 = 10
+const MIN_MOVES_BEFORE_TURN_PART_1 = 0
+const MIN_MOVES_BEFORE_TURN_PART_2 = 4
+const MIN_MOVES_BEFORE_STOP_PART_1 = 0
+const MIN_MOVES_BEFORE_STOP_PART_2 = 4
 
 const buildCityItemsCallbackFn = ({ item, coordinates }) => Number(item)
 
@@ -24,12 +30,13 @@ const NEXT_DIRECTIONS = [
   [-1, 0],
 ]
 
-const solve = (data) => {
-  const cityBlocks = Square({ data, itemCallbackFn: buildCityItemsCallbackFn })
+const isMoving = ([di, dj]) => di !== 0 || dj !== 0
 
-  END_CITY = cityBlocks.getMaxLimits()
-  CITIES = cityBlocks.getSquare()
-
+const findTotalHeatLoss = ({
+  maxMovesSameDirection = MAX_MOVES_SAME_DIRECTION_PART_1,
+  minMovesBeforeTurn = MIN_MOVES_BEFORE_TURN_PART_1,
+  minMovesBeforeStop = MIN_MOVES_BEFORE_STOP_PART_1,
+}) => {
   const seen = new Set()
 
   // i, j = coordinates of the current node
@@ -42,7 +49,7 @@ const solve = (data) => {
   while (nodeQueue.length > 0) {
     const { heatLoss, i, j, di, dj, dn } = nodeQueue.pop()
 
-    if (reachedDestination([i, j])) {
+    if (reachedDestination([i, j]) && dn >= minMovesBeforeStop) {
       totalHeatLoss = heatLoss
       break
     }
@@ -52,7 +59,7 @@ const solve = (data) => {
     }
     seen.add(`${i},${j},${di},${dj},${dn}`)
 
-    if (dn < MAX_MOVES_SAME_DIRECTION && (di !== 0 || dj !== 0)) {
+    if (dn < maxMovesSameDirection && isMoving([di, dj])) {
       const nextI = i + di
       const nextJ = j + dj
 
@@ -70,27 +77,29 @@ const solve = (data) => {
       }
     }
 
-    for (const turnDirection of NEXT_DIRECTIONS) {
-      const [nextDI, nextDJ] = turnDirection
+    if (dn >= minMovesBeforeTurn || !isMoving([di, dj])) {
+      for (const turnDirection of NEXT_DIRECTIONS) {
+        const [nextDI, nextDJ] = turnDirection
 
-      if (
-        (nextDI !== di || nextDJ !== dj) &&
-        (nextDI !== -di || nextDJ !== -dj)
-      ) {
-        const nextI = i + nextDI
-        const nextJ = j + nextDJ
+        if (
+          (nextDI !== di || nextDJ !== dj) &&
+          (nextDI !== -di || nextDJ !== -dj)
+        ) {
+          const nextI = i + nextDI
+          const nextJ = j + nextDJ
 
-        if (isValidMove([nextI, nextJ])) {
-          const increasedHeatLoss = heatLoss + CITIES[nextI][nextJ]
+          if (isValidMove([nextI, nextJ])) {
+            const increasedHeatLoss = heatLoss + CITIES[nextI][nextJ]
 
-          nodeQueue.push({
-            heatLoss: increasedHeatLoss,
-            i: nextI,
-            j: nextJ,
-            di: nextDI,
-            dj: nextDJ,
-            dn: 1,
-          })
+            nodeQueue.push({
+              heatLoss: increasedHeatLoss,
+              i: nextI,
+              j: nextJ,
+              di: nextDI,
+              dj: nextDJ,
+              dn: 1,
+            })
+          }
         }
       }
     }
@@ -99,7 +108,28 @@ const solve = (data) => {
     nodeQueue.sort((a, b) => b.heatLoss - a.heatLoss)
   }
 
+  return totalHeatLoss
+}
+
+const solve = (data) => {
+  const cityBlocks = Square({ data, itemCallbackFn: buildCityItemsCallbackFn })
+
+  END_CITY = cityBlocks.getMaxLimits()
+  CITIES = cityBlocks.getSquare()
+
+  let totalHeatLoss = findTotalHeatLoss({
+    maxMovesSameDirection: MAX_MOVES_SAME_DIRECTION_PART_1,
+  })
+
   console.log('> result 1:', totalHeatLoss)
+
+  totalHeatLoss = findTotalHeatLoss({
+    maxMovesSameDirection: MAX_MOVES_SAME_DIRECTION_PART_2,
+    minMovesBeforeTurn: MIN_MOVES_BEFORE_TURN_PART_2,
+    minMovesBeforeStop: MIN_MOVES_BEFORE_STOP_PART_2,
+  })
+
+  console.log('> result 2:', totalHeatLoss)
 }
 
 export default function () {
