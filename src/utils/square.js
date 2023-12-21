@@ -52,8 +52,11 @@ export const Square = ({ data, itemCallbackFn = null }) => {
   //    [.] [x] [.]
   //    [ ] [.] [ ]
   //
-  // Also, clear out of bounds points
-  const getLineAndColumnAdjascentPoints = (point) => {
+  // Also, clear out of bounds points by default
+  const getLineAndColumnAdjascentPoints = (
+    point,
+    options = { clearOutOfBounds: true }
+  ) => {
     const [i, j] = point
     const lineAndColumnAdjascentPoints = [
       [i - 1, j],
@@ -62,7 +65,9 @@ export const Square = ({ data, itemCallbackFn = null }) => {
       [i + 1, j],
     ]
 
-    return clearOutOfBoundPoints(lineAndColumnAdjascentPoints)
+    return options.clearOutOfBounds
+      ? clearOutOfBoundPoints(lineAndColumnAdjascentPoints)
+      : lineAndColumnAdjascentPoints
   }
 
   // Returns those points based on point x(i,j):
