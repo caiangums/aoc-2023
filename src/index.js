@@ -20,6 +20,7 @@ import solve19 from './19'
 import solve20 from './20'
 import solve21 from './21'
 import solve22 from './22'
+import solve23 from './23'
 // #import
 
 export default function solveAll() {
@@ -45,5 +46,6 @@ export default function solveAll() {
   solve20()
   solve21()
   solve22()
+  solve23()
   // #run
 }
